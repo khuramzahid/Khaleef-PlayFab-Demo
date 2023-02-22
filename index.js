@@ -1,6 +1,7 @@
 var playfab = require('playfab-sdk')
 var PlayFab = playfab.PlayFab
 var PlayFabClient = playfab.PlayFabClient
+var PlayFabMultiplayer = playfab.PlayFabMultiplayer;
 
 PlayFab.settings.titleId = "A68E3";
 var player1LoginRequest = {
@@ -22,10 +23,20 @@ function begin() {
             player1Token = player1.data.EntityToken;
             console.log("Player 1 Token: ");
             console.log(player1Token);
-            PlayFabClient.LoginWithCustomID(player2LoginRequest, (err, player2) => {
-                player2Token = player2.data.EntityToken;
-                console.log("Player 2 Token: ");
-                console.log(player2Token);
+            var reqObj = {
+                Creator: {
+                    Entity: {
+                        Id: player1Token.Entity.Id,
+                        Type: 'title_player_account'
+                    }
+                },
+                GiveUpAfterSeconds: 30,
+                QueueName: "TempQueue"
+            };
+            PlayFabMultiplayer.CreateMatchmakingTicket(reqObj, (err, response) => {
+                console.log("Multiplayer Matchmaking Ticket");
+                console.log(response);
+                console.log(err);
             });
         });
     }
