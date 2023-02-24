@@ -6,7 +6,7 @@ var PlayFabMultiplayer = playfab.PlayFabMultiplayer;
 PlayFab.settings.titleId = "A68E3";
 var player1LoginRequest = {
     TitleId: PlayFab.settings.titleId,
-    CustomId: "Player 1",
+    CustomId: "Player 3",
     CreateAccount: true
 };
 
@@ -31,7 +31,7 @@ function begin() {
                 console.log("Multiplayer Matchmaking Ticket");
                 console.log(response);
                 console.log(err);
-                setInterval(() => {
+                const intervalId = setInterval(() => {
                     PlayFabMultiplayer.GetMatchmakingTicket({
                         EscapeObject: true,
                         QueueName: "TempQueue",
@@ -40,6 +40,19 @@ function begin() {
                         console.log("Get Matchmaking Ticket");
                         console.log(res);
                         console.log(err);
+                        if(res.data.Status == "Matched") {
+                            clearInterval(intervalId);
+                            PlayFabMultiplayer.GetMatch({
+                                EscapeObject: false,
+                                MatchId: res.data.MatchId,
+                                QueueName: "TempQueue",
+                                ReturnMemberAttributes: true
+                                }, (err, res) => {
+                                    console.log("Get Match");
+                                    console.log(res.data);
+                                    console.log(res.data.Members)
+                                })
+                        }
                     });
                 }, 3000);
             });
